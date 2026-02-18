@@ -2,14 +2,16 @@
 from flask import Flask
 from flask_cors import CORS
 import tmdb
-
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 CORS(app)
 
 CATALOG_SIZE = 10
 
-BASE_URL = "http://127.0.0.1:7000"
+load_dotenv()
+BASE_URL = os.getenv("BASE_URL")
 
 MANIFEST = {
     "id": "movie.genre.catalogs",
