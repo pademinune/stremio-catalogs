@@ -10,8 +10,8 @@ CORS(app)
 
 CATALOG_SIZE = 10
 
-load_dotenv()
-BASE_URL = os.getenv("BASE_URL")
+# load_dotenv()
+# BASE_URL = os.getenv("BASE_URL")
 
 MANIFEST = {
     "id": "movie.genre.catalogs",
@@ -27,7 +27,7 @@ MANIFEST = {
                  {"type": "movie", "id": "fantasy_movies", "name": "Fantasy Movies"},
                  {"type": "movie", "id": "horror_movies", "name": "Horror Movies"}
                  ],
-    "logo": f"{BASE_URL}/static/img/favicon.png"
+    # "logo": f"{BASE_URL}/static/img/favicon.png"
 }
 
 @app.route('/manifest.json')
