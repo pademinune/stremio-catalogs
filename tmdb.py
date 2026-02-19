@@ -60,6 +60,7 @@ def get_movies(genre: str, amount: int = 20, start_page = 1):
             movies += response_movies
         else:
             movies += response_movies[0:(amount - len(movies))]
+        page_number += 1
     
     movie_objects = []
     for movie in movies:
@@ -72,7 +73,7 @@ def get_movies(genre: str, amount: int = 20, start_page = 1):
 
 
 if __name__ == "__main__":
-    movies = get_movies("Horror", 20, 3)
+    movies = get_movies("Horror", 40, 3)
     print(len(movies))
     # for movie in movies:
     #     print(movie)

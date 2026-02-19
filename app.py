@@ -58,7 +58,7 @@ def manifest():
 
 @app.route('/catalog/movie/<id>/<path:args>.json')
 @app.route('/catalog/movie/<id>.json')
-@cache.cached()
+# @cache.cached()
 def movie_catalog(id, args = None):
     genre = ID_TO_GENRE[id]
 
