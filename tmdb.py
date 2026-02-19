@@ -7,6 +7,7 @@ import os
 load_dotenv()
 
 TMDB_KEY = os.getenv("TMDB_KEY")
+BASE_URL = os.getenv("BASE_URL")
 
 GENRE_IDS = {"Action": 28, "Adventure": 12, "Animation": 16,
              "Comedy": 35, "Crime": 80, "Documentary": 99,
@@ -40,12 +41,14 @@ def get_imdb_id(tmdb_id: int) -> str:
     return response_dict["imdb_id"]
 
 def get_poster_url(short_url: str) -> str:
+    if (not short_url):
+        return f"{BASE_URL}/static/img/poster_placeholder.png"
     return f"https://image.tmdb.org/t/p/w500{short_url}"
 
-def get_movies(genre: str, amount: int = 20):
+def get_movies(genre: str, amount: int = 20, start_page = 1):
     genre_id = GENRE_IDS[genre]
     movies = []
-    page_number = 1
+    page_number = start_page
 
     while (len(movies) < amount):
         query = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_KEY}&language=en-US&sort_by=popularity.desc&page={page_number}&with_genres={genre_id}"
@@ -69,7 +72,8 @@ def get_movies(genre: str, amount: int = 20):
 
 
 if __name__ == "__main__":
-    movies = get_movies("Horror", 50)
-    for movie in movies:
-        print(movie)
+    movies = get_movies("Horror", 20, 3)
+    print(len(movies))
+    # for movie in movies:
+    #     print(movie)
 

@@ -6,7 +6,7 @@ import tmdb
 from dotenv import load_dotenv
 import os
 
-CATALOG_SIZE = 10
+CATALOG_SIZE = 20
 
 load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
@@ -15,19 +15,27 @@ MANIFEST = {
     "id": "movie.genre.catalogs",
     "name": "Movie Genre Catalogs",
     "description": "Get more catalogs.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "resources": ["catalog"],
     "types": ["movie"],
-    "catalogs": [{"type": "movie", "id": "action_movies", "name": "Action Movies"},
-                 {"type": "movie", "id": "adventure_movies", "name": "Adventure Movies"},
-                 {"type": "movie", "id": "comedy_movies", "name": "Comedy Movies"},
-                 {"type": "movie", "id": "drama_movies", "name": "Drama Movies"},
-                 {"type": "movie", "id": "fantasy_movies", "name": "Fantasy Movies"},
-                 {"type": "movie", "id": "horror_movies", "name": "Horror Movies"}
+    "catalogs": [{"type": "movie", "id": "action_movies", "name": "Action Movies", "extra": [{"name": "skip"}]},
+                 {"type": "movie", "id": "adventure_movies", "name": "Adventure Movies", "extra": [{"name": "skip"}]},
+                 {"type": "movie", "id": "comedy_movies", "name": "Comedy Movies", "extra": [{"name": "skip"}]},
+                 {"type": "movie", "id": "drama_movies", "name": "Drama Movies", "extra": [{"name": "skip"}]},
+                 {"type": "movie", "id": "fantasy_movies", "name": "Fantasy Movies", "extra": [{"name": "skip"}]},
+                 {"type": "movie", "id": "horror_movies", "name": "Horror Movies", "extra": [{"name": "skip"}]}
                  ],
     "logo": f"{BASE_URL}/static/img/favicon.png"
 }
 
+ID_TO_GENRE = {
+    "action_movies": "Action",
+    "adventure_movies": "Adventure",
+    "comedy_movies": "Comedy",
+    "drama_movies": "Drama",
+    "fantasy_movies": "Fantasy",
+    "horror_movies": "Horror",
+}
 
 app = Flask(__name__)
 CORS(app)
@@ -48,49 +56,32 @@ def index():
 def manifest():
     return MANIFEST
 
-@app.route("/catalog/movie/action_movies.json")
+@app.route('/catalog/movie/<id>/<path:args>.json')
+@app.route('/catalog/movie/<id>.json')
 @cache.cached()
-def action_catalog():
-    movies = tmdb.get_movies("Action", CATALOG_SIZE)
-    metas = [movie.to_dict() for movie in movies]
-    return {"metas": metas}
+def movie_catalog(id, args = None):
+    genre = ID_TO_GENRE[id]
 
-@app.route("/catalog/movie/adventure_movies.json")
-@cache.cached()
-def adventure_catalog():
-    movies = tmdb.get_movies("Adventure", CATALOG_SIZE)
-    metas = [movie.to_dict() for movie in movies]
-    return {"metas": metas}
+    skip = 0
+    if args and 'skip=' in args:
+        try:
+            skip = int(args.split('=')[1])
+        except ValueError:
+            skip = 0
 
-@app.route("/catalog/movie/comedy_movies.json")
-@cache.cached()
-def comedy_catalog():
-    movies = tmdb.get_movies("Comedy", CATALOG_SIZE)
-    metas = [movie.to_dict() for movie in movies]
-    return {"metas": metas}
-
-@app.route("/catalog/movie/drama_movies.json")
-@cache.cached()
-def drama_catalog():
-    movies = tmdb.get_movies("Drama", CATALOG_SIZE)
-    metas = [movie.to_dict() for movie in movies]
-    return {"metas": metas}
-
-@app.route("/catalog/movie/fantasy_movies.json")
-@cache.cached()
-def fantasy_catalog():
-    movies = tmdb.get_movies("Fantasy", CATALOG_SIZE)
-    metas = [movie.to_dict() for movie in movies]
-    return {"metas": metas}
-
-@app.route("/catalog/movie/horror_movies.json")
-@cache.cached()
-def horror_catalog():
-    movies = tmdb.get_movies("Horror", CATALOG_SIZE)
+    page = skip // 20 + 1
+    if (skip % 20 != 0): # it was rounded down, so add 1
+        page += 1
+    
+    movies = tmdb.get_movies(genre, CATALOG_SIZE, start_page=page)
     metas = [movie.to_dict() for movie in movies]
     return {"metas": metas}
 
 
+@app.route("/clear-cache")
+def clear_cache():
+    cache.clear()
+    return "Cache cleared successfully!"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=7000, debug=True)
