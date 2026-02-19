@@ -6,7 +6,7 @@ import tmdb
 from dotenv import load_dotenv
 import os
 
-CATALOG_SIZE = 20
+CATALOG_SIZE = 40
 
 load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
