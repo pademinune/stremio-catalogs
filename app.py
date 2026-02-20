@@ -23,7 +23,10 @@ MANIFEST = {
                  {"type": "movie", "id": "comedy_movies", "name": "Comedy Movies", "extra": [{"name": "skip"}]},
                  {"type": "movie", "id": "drama_movies", "name": "Drama Movies", "extra": [{"name": "skip"}]},
                  {"type": "movie", "id": "fantasy_movies", "name": "Fantasy Movies", "extra": [{"name": "skip"}]},
-                 {"type": "movie", "id": "horror_movies", "name": "Horror Movies", "extra": [{"name": "skip"}]}
+                 {"type": "movie", "id": "horror_movies", "name": "Horror Movies", "extra": [{"name": "skip"}]},
+                 {"type": "movie", "id": "sub_100_minutes", "name": "Movies Under 100 minutes", "extra": [{"name": "skip"}]},
+                #  {"type": "movie", "id": "documentaries", "name": "Documentaries", "extra": [{"name": "skip"}]},
+                #  {"type": "movie", "id": "random_movie", "name": "Random Movie"}
                  ],
     "logo": f"{BASE_URL}/static/img/favicon.png"
 }
@@ -35,6 +38,7 @@ ID_TO_GENRE = {
     "drama_movies": "Drama",
     "fantasy_movies": "Fantasy",
     "horror_movies": "Horror",
+    "documentaries": "Documentary",
 }
 
 app = Flask(__name__)
@@ -55,6 +59,30 @@ def index():
 @app.route("/manifest.json")
 def manifest():
     return MANIFEST
+
+@app.route('/catalog/movie/random_movie.json')
+def random_movie():
+    movie = tmdb.get_random_movie()
+    return {"metas": [movie.to_dict()]}
+
+@app.route('/catalog/movie/sub_100_minutes/<path:args>.json')
+@app.route("/catalog/movie/sub_100_minutes.json")
+@cache.cached()
+def sub_100_minutes(args=None):
+    skip = 0
+    if args and 'skip=' in args:
+        try:
+            skip = int(args.split('=')[1])
+        except ValueError:
+            skip = 0
+
+    page = skip // 20 + 1
+    if (skip % 20 != 0): # it was rounded down, so add 1
+        page += 1
+    
+    movies = tmdb.get_movies_filtered({"with_runtime.lte": 100, "with_runtime.gte": 60}, CATALOG_SIZE, start_page=page)
+    metas = [movie.to_dict() for movie in movies]
+    return {"metas": metas}
 
 @app.route('/catalog/movie/<id>/<path:args>.json')
 @app.route('/catalog/movie/<id>.json')
