@@ -5,6 +5,7 @@ from flask_caching import Cache
 import tmdb
 from dotenv import load_dotenv
 import os
+import redis_cache
 
 CATALOG_SIZE = 40
 
@@ -86,8 +87,12 @@ def sub_100_minutes(args=None):
 
 @app.route('/catalog/movie/<id>/<path:args>.json')
 @app.route('/catalog/movie/<id>.json')
-@cache.cached()
+# @cache.cached()
 def movie_catalog(id, args = None):
+    cached = redis_cache.get_cache(id)
+    if (cached):
+        return cached
+
     genre = ID_TO_GENRE[id]
 
     skip = 0
@@ -103,7 +108,9 @@ def movie_catalog(id, args = None):
     
     movies = tmdb.get_movies(genre, CATALOG_SIZE, start_page=page)
     metas = [movie.to_dict() for movie in movies]
-    return {"metas": metas}
+    response = {"metas": metas}
+    redis_cache.set_cache(id, response)
+    return response
 
 
 @app.route("/clear-cache")
