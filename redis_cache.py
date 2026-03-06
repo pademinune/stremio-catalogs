@@ -25,6 +25,8 @@ if __name__ == "__main__":
 
     keys = redis_client.keys("*")
 
+    # set_cache("foo", {"foo": "yes"})
+    print(get_cache("foo"))
     for key in keys: # type: ignore
         # val = redis_client.get(key)
         # print(val)

@@ -85,22 +85,8 @@ def sub_100_minutes(args=None):
     metas = [movie.to_dict() for movie in movies]
     return {"metas": metas}
 
-@app.route('/catalog/movie/<id>/<path:args>.json')
-@app.route('/catalog/movie/<id>.json')
-# @cache.cached()
-def movie_catalog(id, args = None):
-    cached = redis_cache.get_cache(id)
-    if (cached):
-        return cached
-
-    genre = ID_TO_GENRE[id]
-
-    skip = 0
-    if args and 'skip=' in args:
-        try:
-            skip = int(args.split('=')[1])
-        except ValueError:
-            skip = 0
+def fetch_movie_genre(genre_id: str, skip: int = 0):
+    genre = ID_TO_GENRE[genre_id]
 
     page = skip // 20 + 1
     if (skip % 20 != 0): # it was rounded down, so add 1
@@ -109,14 +95,39 @@ def movie_catalog(id, args = None):
     movies = tmdb.get_movies(genre, CATALOG_SIZE, start_page=page)
     metas = [movie.to_dict() for movie in movies]
     response = {"metas": metas}
+    return response
+
+@app.route('/catalog/movie/<id>/<path:args>.json')
+@app.route('/catalog/movie/<id>.json')
+# @cache.cached()
+def movie_catalog(id, args = None):
+    cached = redis_cache.get_cache(id)
+    if (cached):
+        return cached
+
+    skip = 0
+    if args and 'skip=' in args:
+        try:
+            skip = int(args.split('=')[1])
+        except ValueError:
+            skip = 0
+
+    response = fetch_movie_genre(id, skip)
     redis_cache.set_cache(id, response)
     return response
 
+@app.route("/cache/refresh")
+def cache_refresh():
+    for genre_id in ID_TO_GENRE.keys():
+        response = fetch_movie_genre(genre_id, skip=0)
+        redis_cache.set_cache(genre_id, response)
+    return "Cache refresh started."
 
-@app.route("/clear-cache")
+@app.route("/cache/reset")
+@app.route("/cache/clear")
 def clear_cache():
     cache.clear()
-    return "Cache cleared successfully!"
+    return "Cache cleared successfully."
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=7000, debug=True)
