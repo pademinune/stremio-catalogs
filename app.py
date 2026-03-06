@@ -18,7 +18,7 @@ MANIFEST = {
     "id": "movie.genre.catalogs",
     "name": "Stremio Catalogs",
     "description": "Get more catalogs.",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "resources": ["catalog"],
     "types": ["movie"],
     "catalogs": [{"type": "movie", "id": "action_movies", "name": "Action", "extra": [{"name": "skip"}]},
