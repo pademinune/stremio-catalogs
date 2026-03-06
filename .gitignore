@@ -1,3 +1,7 @@
+# MINE
+.tmp/
+redis_cache.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -214,6 +218,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-
-# MINE
-.tmp/
