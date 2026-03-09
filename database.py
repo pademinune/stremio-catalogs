@@ -25,12 +25,12 @@ print(cur.fetchall())
 #     )
 # """)
 
-cur.execute("""
-    INSERT INTO users (token, language, genres)
-    VALUES (%s, %s, %s)
-""", ("abatok3nag42", "en", '[3, 5]'))
+# cur.execute("""
+#     INSERT INTO users (token, language, genres)
+#     VALUES (%s, %s, %s)
+# """, ("abatok3nag42", "en", '[3, 5]'))
 
-conn.commit()
+# conn.commit()
 
 cur.close()
 conn.close()
