@@ -5,7 +5,6 @@ import tmdb
 from dotenv import load_dotenv
 import os
 import math
-import threading
 
 CATALOG_SIZE = 40
 
@@ -176,10 +175,8 @@ def refresh_cache_endpoint():
     if token != CRON_SECRET:
         return "Unauthorized", 401
 
-    # thread = threading.Thread(target=refresh_cache)
-    # thread.start()
     refresh_cache()
-    return "Cache refresh started."
+    return "Cache refreshed."
 
 
 def refresh_cache():
@@ -196,10 +193,8 @@ def clear_cache_endpoint():
     if token != CRON_SECRET:
         return "Unauthorized", 401
 
-    # thread = threading.Thread(target=clear_cache)
-    # thread.start()
     clear_cache()
-    return "Cache clear started."
+    return "Cache cleared."
 
 
 def clear_cache():
