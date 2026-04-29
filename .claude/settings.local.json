@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./beamup-cli-win-x64.exe config *)",
+      "Bash(./beamup-cli-win-x64.exe secrets *)"
+    ]
+  }
+}
