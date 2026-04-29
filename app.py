@@ -176,8 +176,9 @@ def refresh_cache_endpoint():
     if token != CRON_SECRET:
         return "Unauthorized", 401
 
-    thread = threading.Thread(target=refresh_cache)
-    thread.start()
+    # thread = threading.Thread(target=refresh_cache)
+    # thread.start()
+    refresh_cache()
     return "Cache refresh started."
 
 
@@ -195,8 +196,9 @@ def clear_cache_endpoint():
     if token != CRON_SECRET:
         return "Unauthorized", 401
 
-    thread = threading.Thread(target=clear_cache)
-    thread.start()
+    # thread = threading.Thread(target=clear_cache)
+    # thread.start()
+    clear_cache()
     return "Cache clear started."
 
 
